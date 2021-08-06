@@ -5,19 +5,25 @@
     <Layout class="main">
       <Sider hide-trigger
         width="250"
-        style="min-height:100vh;">
+        style="min-height:100vh;overflow:auto;">
         <Menu theme="light"
           width="250px"
           style="min-height: 100%;">
           <MenuItem v-for="(list,index) in users"
             :key="index"
             :name="list.uuid">
-          <div class="animated bounce">用户{{index}}</div>
+          <div @click="chatUser(list)"
+            class="animated bounce">用户{{index}}</div>
           </MenuItem>
         </Menu>
       </Sider>
       <Content>
-        <chatCom @sendMsg="sendMsg"></chatCom>
+        <keep-alive>
+          <chatCom @sendMsg="sendMsg"
+            :chatMsgs="chatMsgs"
+            v-if="uuid">
+          </chatCom>
+        </keep-alive>
       </Content>
     </Layout>
   </section>
@@ -40,42 +46,57 @@ export default {
     return {
       ws: null,
 
-      users: [
-        {
-          uuid: '001',
-        },
-        {
-          uuid: '002',
-        },
-        {
-          uuid: '003',
-        },
-      ],
-
+      users: [],
+      uuid: 0,
+      chatMsgs: [],
+      timer: null
     }
   },
   created() {
-    // this.setWs()
+    this.setWs()
   },
   methods: {
+
+    //选择用户聊天
+    chatUser(user) {
+      this.chatMsgs = []
+      this.uuid = user.uuid
+      this.chatMsgs = user.msg
+
+    },
+
     setWs() {
-      try {
-        this.ws = new WebSocket('ws://192.168.1.115:8080/websocket/' + this.chatMsg)
-        this.ws.onopen = function (e) {
-          console.log('建立了聊天!');
+      this.timer = window.setInterval(() => {
+        if (this.users.length < 3) {
+          this.users.push({
+            uuid: Math.floor(Math.random(0, 1) * 100000),
+            msg: [Math.floor(Math.random(0, 1) * 100000)]
+          })
+          console.log(this.users);
+        } else {
+          window.clearInterval(this.timer)
         }
-        this.ws.onmessage = function (e) {
-          console.log('收到消息：' + e.data);
-        }
-        this.ws.onclose = function (e) {
-          console.log('与服务器断开');
-        }
-        this.ws.onError = function (e) {
-          console.log('链接异常');
-        }
-      } catch (error) {
-        console.log(error);
-      }
+      }, 1500)
+
+
+
+      // try {
+      //   this.ws = new WebSocket('ws://192.168.1.115:8080/websocket/' + this.chatMsg)
+      //   this.ws.onopen = function (e) {
+      //     console.log('建立了聊天!');
+      //   }
+      //   this.ws.onmessage = function (e) {
+      //     console.log('收到消息：' + e.data);
+      //   }
+      //   this.ws.onclose = function (e) {
+      //     console.log('与服务器断开');
+      //   }
+      //   this.ws.onError = function (e) {
+      //     console.log('链接异常');
+      //   }
+      // } catch (error) {
+      //   console.log(error);
+      // }
     },
 
     sendMsg(chatMsg) {

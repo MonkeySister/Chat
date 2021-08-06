@@ -3,7 +3,7 @@
     <div class="chatDetail">
       <div class="chatDetailCon">
         <div class="chatItem animated fadeInLeft"
-          v-for="(list,index) in msg"
+          v-for="(list,index) in chatMsgs"
           :key="index">
           <div class="chatAvator">
             <img src="https://5km2019.oss-cn-hangzhou.aliyuncs.com/TrongGo/companyLogo.png"
@@ -29,9 +29,16 @@
 <script>
 export default {
   name: 'chatCom',
+  props: {
+    chatMsgs: {
+      type: Array,
+      default: () => {
+        return []
+      }
+    }
+  },
   data() {
     return {
-      msg: ['创狗云官方客服，请问有什么可以帮助您的？'],
       chatMsg: '',
     }
   },
