@@ -76,6 +76,24 @@ module.export = {
       config.mode = "development"
     }
   },
+  devServer: {
+    proxy: {
+      "/api": {
+        target:
+          "http://data.zz.baidu.com/urls?site=https://www.trongou.com&token=X9s6ebtuNpDydfRA",
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          "^/api": "",
+        },
+      },
+    },
+    host: "127.0.0.1",
+    port: "8080",
+    hot: true,
+    https: false, // https:{type:Boolean}
+    open: true, // 配置自动启动浏览器
+  },
   // 是一个函数，会接收一个基于 webpack-chain 的 ChainableConfig 实例。允许对内部的 webpack 配置进行更细粒度的修改。
   chainWebpack: () => {},
   css: {

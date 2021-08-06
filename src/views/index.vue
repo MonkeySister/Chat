@@ -13,16 +13,18 @@
             :key="index"
             :name="list.uuid">
           <div @click="chatUser(list)"
-            class="animated bounce">用户{{index}}</div>
+            class="animated bounce">咨询客户{{index}}</div>
           </MenuItem>
         </Menu>
       </Sider>
       <Content>
         <keep-alive>
-          <chatCom @sendMsg="sendMsg"
-            :chatMsgs="chatMsgs"
-            v-if="uuid">
-          </chatCom>
+          <component v-bind:is="currentComponent"></component>
+          <!-- <chatCom v-for="(list,index) in users"
+            :key="index"
+            @sendMsg="sendMsg"
+            :chatMsgs="chatMsgs">
+          </chatCom> -->
         </keep-alive>
       </Content>
     </Layout>
@@ -45,11 +47,11 @@ export default {
   data() {
     return {
       ws: null,
-
       users: [],
       uuid: 0,
       chatMsgs: [],
-      timer: null
+      timer: null,
+      currentComponent: 'chatCom'
     }
   },
   created() {
@@ -67,12 +69,22 @@ export default {
 
     setWs() {
       this.timer = window.setInterval(() => {
-        if (this.users.length < 3) {
+        if (this.users.length < 10) {
           this.users.push({
             uuid: Math.floor(Math.random(0, 1) * 100000),
-            msg: [Math.floor(Math.random(0, 1) * 100000)]
+            msg: [
+              {
+                msg: Math.floor(Math.random(0, 1) * 100000),
+                role: this.users.length % 2 === 0 ? 0 : 1//0是服务，1是客户
+              },
+              {
+                msg: Math.floor(Math.random(0, 1) * 100000),
+                role: this.users.length % 2 === 0 ? 1 : 0//0是服务，1是客户
+              }
+            ]
           })
-          console.log(this.users);
+          console.log(this.users)
+
         } else {
           window.clearInterval(this.timer)
         }
@@ -101,6 +113,7 @@ export default {
 
     sendMsg(chatMsg) {
       this.ws.send(chatMsg)
+
     }
   }
 }

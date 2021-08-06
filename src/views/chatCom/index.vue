@@ -2,15 +2,21 @@
   <div class="content">
     <div class="chatDetail">
       <div class="chatDetailCon">
-        <div class="chatItem animated fadeInLeft"
+        <div class="chatItem animated"
           v-for="(list,index) in chatMsgs"
-          :key="index">
+          :key="index"
+          :class="[!list.role?'chatItemClient':'',!list.role?'fadeInRight':'fadeInLeft']">
           <div class="chatAvator">
-            <img src="https://5km2019.oss-cn-hangzhou.aliyuncs.com/TrongGo/companyLogo.png"
+            <img v-if="!list.role"
+              src="https://5km2019.oss-cn-hangzhou.aliyuncs.com/TrongGo/companyLogo.png"
               alt="">
+            <Avatar v-else
+              shape="square"
+              icon="ios-person"
+              style="width:40px;height:40px" />
           </div>
           <div class="chatMsg">
-            {{list}}
+            {{list.msg}}
           </div>
         </div>
       </div>
@@ -45,9 +51,14 @@ export default {
   methods: {
     // 发送消息
     sendMsg() {
-      if (!this.chatMsg) return alert("不能发空空消息！")
+      if (!this.chatMsg) return this.$Message.error("不能发空空消息！")
       try {
+        this.chatMsgs.push({
+          msg: this.chatMsg,
+          role: 0
+        })
         this.$emit('sendMsg', this.chatMsg)
+        this.chatMsg = ''
       } catch (err) {
         console.log(err);
       }
@@ -81,15 +92,16 @@ export default {
 }
 .chatItem {
   width: 100%;
-  padding-top: 10px;
-  margin: 10px quto;
+  padding-top: 20px;
   display: flex;
 }
+
 .chatAvator {
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  margin-right: 10px;
+  margin: 0 10px;
+  order: 1;
   background-color: #fff;
   img {
     width: 100%;
@@ -97,6 +109,7 @@ export default {
   }
 }
 .chatMsg {
+  order: 2;
   width: auto;
   max-width: 60%;
   word-wrap: break-word;
@@ -106,6 +119,16 @@ export default {
   color: #000;
   text-align: left;
   position: relative;
+}
+
+.chatItemClient {
+  justify-content: flex-end;
+  .chatAvator {
+    order: 2;
+  }
+  .chatMsg {
+    order: 1;
+  }
 }
 
 .chatInsert {
